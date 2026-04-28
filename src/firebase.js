@@ -23,8 +23,8 @@ try {
     app = initializeApp(firebaseConfig);
   } else {
     // If empty config, initialize with placeholder so it doesn't crash, but it won't work until configured.
-    console.warn("Firebase config is missing. Please add it to src/firebase.js");
-    app = initializeApp({ apiKey: "placeholder", projectId: "placeholder", appId: "placeholder" });
+    console.warn("Firebase config is missing. Please add it to src/firebase.js or your environment secrets.");
+    app = initializeApp({ apiKey: "placeholder", projectId: "placeholder", appId: "placeholder", authDomain: "placeholder" });
   }
 
   auth = getAuth(app);
