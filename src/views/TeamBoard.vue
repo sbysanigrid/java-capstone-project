@@ -7,11 +7,6 @@
           <v-chip class="ml-3 font-weight-bold" color="primary" variant="flat" size="small">{{ teamName }}</v-chip>
         </h1>
       </v-col>
-      <v-col cols="12" md="6" class="text-right">
-        <v-btn v-if="isAuthorized" color="primary" prepend-icon="mdi-plus" rounded="pill" elevation="2" class="font-weight-bold" size="small" @click="dialog = true">
-          Add Task
-        </v-btn>
-      </v-col>
     </v-row>
 
     <!-- New Module Specifications Dashboard -->
@@ -30,13 +25,13 @@
                 </div>
                 <h2 class="text-h6 font-weight-bold text-white mb-3" style="line-height: 1.4;">{{ teamMetaInfo.mission }}</h2>
                 <div class="d-flex align-center flex-wrap gap-2 text-caption">
-                  <v-chip size="small" variant="flat" color="surface-variant" class="font-weight-medium">
+                  <v-chip size="small" variant="flat" class="font-weight-medium text-white" style="background: rgba(0,0,0,0.35);">
                     <v-icon start size="x-small">mdi-map-marker</v-icon> {{ teamMetaInfo.city }}
                   </v-chip>
-                  <v-chip size="small" variant="flat" color="surface-variant" class="font-weight-medium">
+                  <v-chip size="small" variant="flat" class="font-weight-medium text-white" style="background: rgba(0,0,0,0.35);">
                     <v-icon start size="x-small">mdi-account-group</v-icon> {{ teamMetaInfo.size }} Members
                   </v-chip>
-                  <v-chip size="small" variant="flat" color="surface-variant" class="font-weight-medium">
+                  <v-chip size="small" variant="flat" class="font-weight-medium text-white" style="background: rgba(0,0,0,0.35);">
                     <v-icon start size="x-small">mdi-account-hard-hat</v-icon> {{ teamMetaInfo.roles }}
                   </v-chip>
                 </div>
@@ -73,7 +68,6 @@
             <v-tab value="data" class="text-caption font-weight-bold text-uppercase">Data & Integrations</v-tab>
             <v-tab value="requirements" class="text-caption font-weight-bold text-uppercase">Requirements</v-tab>
             <v-tab value="roster" class="text-caption font-weight-bold text-uppercase">Team Roster</v-tab>
-            <v-tab value="design" class="text-caption font-weight-bold text-uppercase">Design & Flow</v-tab>
           </v-tabs>
 
           <v-card-text class="pa-0">
@@ -106,33 +100,62 @@
               </v-window-item>
 
               <!-- Dependencies Tab -->
-              <v-window-item value="dependencies" class="pa-4">
-                <v-row>
-                  <v-col cols="12" md="6">
-                    <div class="d-flex align-center mb-3">
-                      <v-icon color="success" size="small" class="mr-2">mdi-export</v-icon>
-                      <h3 class="text-subtitle-2 font-weight-bold text-success text-uppercase">You Provide</h3>
+              <v-window-item value="dependencies" class="pa-6">
+                <div class="data-flow-container d-flex flex-column flex-md-row align-stretch justify-center w-100 position-relative" style="min-height: 300px; gap: 24px;">
+                  
+                  <!-- Left: Inputs -->
+                  <div class="flow-column d-flex flex-column justify-center" style="flex: 1; z-index: 2;">
+                    <div class="text-overline text-error font-weight-bold mb-4 text-center">
+                      <v-icon size="small" class="mr-1">mdi-import</v-icon> Inputs (Needs)
                     </div>
-                    <v-card v-for="(p, i) in teamMetaInfo.provides" :key="i" class="mb-2 pa-3 glass-card-dark" elevation="0">
-                      <div class="d-flex align-start">
-                        <v-chip size="x-small" color="success" variant="flat" class="mr-3 mt-1 font-weight-bold flex-shrink-0">{{ p.to }}</v-chip>
-                        <span class="text-body-2 text-grey-lighten-1">{{ p.what }}</span>
+                    <v-card v-for="(n, i) in teamMetaInfo.needs" :key="i" class="mb-3 pa-3 glass-card-dark position-relative node-card input-node" elevation="0" style="border-right: 3px solid var(--v-error-base, #f44336);">
+                      <div class="text-caption font-weight-bold text-error mb-1 d-flex align-center">
+                        <v-icon size="x-small" class="mr-1">mdi-arrow-right-bottom</v-icon> {{ n.from }}
                       </div>
+                      <div class="text-body-2 text-white lh-sm" style="font-size: 0.8rem;">{{ n.what }}</div>
                     </v-card>
-                  </v-col>
-                  <v-col cols="12" md="6">
-                    <div class="d-flex align-center mb-3">
-                      <v-icon color="error" size="small" class="mr-2">mdi-import</v-icon>
-                      <h3 class="text-subtitle-2 font-weight-bold text-error text-uppercase">You Need From</h3>
+                    <div v-if="!teamMetaInfo.needs?.length" class="text-center text-grey-lighten-1 text-caption pa-4 border-dashed rounded-lg" style="border-color: rgba(255,255,255,0.1) !important;">No dependencies</div>
+                  </div>
+
+                  <!-- Flow Arrows Left -> Center -->
+                  <div class="flow-connector hidden-sm-and-down d-flex flex-column justify-center align-center position-relative" style="width: 60px;">
+                    <div class="flow-animated-line left-line"></div>
+                    <v-icon color="error" class="position-absolute" style="right: -8px;">mdi-chevron-right</v-icon>
+                  </div>
+
+                  <!-- Center: Focal Team -->
+                  <div class="flow-column d-flex flex-column justify-center align-center" style="flex: 0 0 auto; width: 220px; z-index: 3;">
+                    <div class="focal-node-glow" :style="`background: ${teamMetaInfo.color};`"></div>
+                    <v-card class="pa-5 w-100 text-center glass-card focal-node" :style="`border: 2px solid ${teamMetaInfo.color}; border-radius: 20px;`" elevation="10">
+                      <v-avatar :color="teamMetaInfo.color" size="56" class="mb-3 elevation-4">
+                        <v-icon size="large" color="white">mdi-shield-check</v-icon>
+                      </v-avatar>
+                      <h3 class="text-subtitle-1 font-weight-bold text-white lh-sm mb-1">Team {{ teamId }}</h3>
+                      <v-chip size="x-small" variant="flat" :color="teamMetaInfo.color" class="font-weight-bold px-2">Core Processor</v-chip>
+                    </v-card>
+                  </div>
+
+                  <!-- Flow Arrows Center -> Right -->
+                  <div class="flow-connector hidden-sm-and-down d-flex flex-column justify-center align-center position-relative" style="width: 60px;">
+                    <div class="flow-animated-line right-line"></div>
+                    <v-icon color="success" class="position-absolute" style="right: -8px;">mdi-chevron-right</v-icon>
+                  </div>
+
+                  <!-- Right: Outputs -->
+                  <div class="flow-column d-flex flex-column justify-center" style="flex: 1; z-index: 2;">
+                    <div class="text-overline text-success font-weight-bold mb-4 text-center">
+                      Outputs (Provides) <v-icon size="small" class="ml-1">mdi-export</v-icon>
                     </div>
-                    <v-card v-for="(n, i) in teamMetaInfo.needs" :key="i" class="mb-2 pa-3 glass-card-dark" elevation="0">
-                      <div class="d-flex align-start">
-                        <v-chip size="x-small" color="error" variant="flat" class="mr-3 mt-1 font-weight-bold flex-shrink-0">{{ n.from }}</v-chip>
-                        <span class="text-body-2 text-grey-lighten-1">{{ n.what }}</span>
+                    <v-card v-for="(p, i) in teamMetaInfo.provides" :key="i" class="mb-3 pa-3 glass-card-dark position-relative node-card output-node" elevation="0" style="border-left: 3px solid var(--v-success-base, #4CAF50);">
+                      <div class="text-caption font-weight-bold text-success mb-1 d-flex align-center">
+                        {{ p.to }} <v-icon size="x-small" class="ml-1">mdi-arrow-top-right</v-icon>
                       </div>
+                      <div class="text-body-2 text-white lh-sm" style="font-size: 0.8rem;">{{ p.what }}</div>
                     </v-card>
-                  </v-col>
-                </v-row>
+                    <div v-if="!teamMetaInfo.provides?.length" class="text-center text-grey-lighten-1 text-caption pa-4 border-dashed rounded-lg" style="border-color: rgba(255,255,255,0.1) !important;">No outputs</div>
+                  </div>
+                  
+                </div>
               </v-window-item>
 
               <!-- Data & Integrations Tab -->
@@ -170,10 +193,10 @@
               <v-window-item value="requirements" class="pa-0">
                 <div class="bg-surface-variant pa-2 d-flex align-center flex-wrap gap-2 border-b-sm" style="border-color: rgba(255,255,255,0.05) !important;">
                   <span class="text-caption font-weight-bold text-grey-lighten-1 ml-2 mr-2">Filter:</span>
-                  <v-chip size="small" :variant="reqFilter === 'All' ? 'flat' : 'tonal'" :color="reqFilter === 'All' ? 'primary' : 'grey'" @click="reqFilter = 'All'">All</v-chip>
-                  <v-chip size="small" :variant="reqFilter === 'Must' ? 'flat' : 'tonal'" :color="reqFilter === 'Must' ? 'error' : 'grey'" @click="reqFilter = 'Must'">Must-Have</v-chip>
-                  <v-chip size="small" :variant="reqFilter === 'Should' ? 'flat' : 'tonal'" :color="reqFilter === 'Should' ? 'warning' : 'grey'" @click="reqFilter = 'Should'">Should-Have</v-chip>
-                  <v-chip size="small" :variant="reqFilter === 'AI' ? 'flat' : 'tonal'" :color="reqFilter === 'AI' ? 'accent' : 'grey'" @click="reqFilter = 'AI'">
+                  <v-chip size="small" :variant="reqFilter === 'All' ? 'flat' : 'outlined'" :color="reqFilter === 'All' ? 'primary' : 'grey-lighten-1'" @click="reqFilter = 'All'">All</v-chip>
+                  <v-chip size="small" :variant="reqFilter === 'Must' ? 'flat' : 'outlined'" :color="reqFilter === 'Must' ? 'error' : 'grey-lighten-1'" @click="reqFilter = 'Must'">Must-Have</v-chip>
+                  <v-chip size="small" :variant="reqFilter === 'Should' ? 'flat' : 'outlined'" :color="reqFilter === 'Should' ? 'warning' : 'grey-lighten-1'" @click="reqFilter = 'Should'">Should-Have</v-chip>
+                  <v-chip size="small" :variant="reqFilter === 'AI' ? 'flat' : 'outlined'" :color="reqFilter === 'AI' ? 'secondary' : 'grey-lighten-1'" @click="reqFilter = 'AI'">
                     <v-icon start size="x-small">mdi-brain</v-icon> AI Features
                   </v-chip>
                 </div>
@@ -233,21 +256,23 @@
                       <v-icon :color="teamMetaInfo.color" size="small" class="mr-2">mdi-account-group</v-icon>
                       <h3 class="text-subtitle-2 font-weight-bold text-uppercase" :style="`color: ${teamMetaInfo.color};`">Engineers</h3>
                     </div>
-                    <div class="d-flex flex-wrap gap-2">
-                      <v-card v-for="member in rosterEngineers" :key="member.id" class="pa-2 flex-grow-1" min-width="200" rounded="lg" elevation="0" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.05);">
-                        <div class="d-flex align-center">
-                          <v-avatar size="32" :color="teamMetaInfo.color" class="mr-3">
-                            <span class="text-caption font-weight-bold text-white">{{ member.name.charAt(0) }}</span>
-                          </v-avatar>
-                          <div>
-                            <div class="text-body-2 font-weight-bold text-white lh-sm">{{ member.name }}</div>
-                            <div v-if="member.location" class="text-grey-lighten-1 d-flex align-center mt-1" style="font-size: 0.65rem; line-height: 1;">
-                              <v-icon size="8" class="mr-1">mdi-map-marker</v-icon> {{ member.location }}
+                    <v-row dense>
+                      <v-col v-for="member in rosterEngineers" :key="member.id" cols="12" sm="6" md="4">
+                        <v-card class="pa-2 h-100" rounded="lg" elevation="0" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.07);">
+                          <div class="d-flex align-center">
+                            <v-avatar size="32" :color="teamMetaInfo.color" class="mr-3 flex-shrink-0">
+                              <span class="text-caption font-weight-bold text-white">{{ member.name.charAt(0) }}</span>
+                            </v-avatar>
+                            <div class="overflow-hidden">
+                              <div class="text-body-2 font-weight-bold text-white lh-sm text-truncate">{{ member.name }}</div>
+                              <div v-if="member.location" class="text-grey-lighten-1 d-flex align-center mt-1" style="font-size: 0.65rem; line-height: 1;">
+                                <v-icon size="8" class="mr-1">mdi-map-marker</v-icon> {{ member.location }}
+                              </div>
                             </div>
                           </div>
-                        </div>
-                      </v-card>
-                    </div>
+                        </v-card>
+                      </v-col>
+                    </v-row>
                     <div v-if="!rosterEngineers.length" class="text-caption text-grey-lighten-1 mb-4 pa-3 border-dashed rounded-lg" style="border-color: rgba(255,255,255,0.1) !important;">
                       No engineers assigned.
                     </div>
@@ -255,64 +280,6 @@
                 </v-row>
               </v-window-item>
 
-              <!-- Design & Flow Tab -->
-              <v-window-item value="design" class="pa-4">
-                <v-row>
-                  <!-- Architecture Data Flow -->
-                  <v-col cols="12" md="5">
-                    <div class="d-flex align-center mb-4">
-                      <v-icon :color="teamMetaInfo.color" size="small" class="mr-2">mdi-transit-connection-variant</v-icon>
-                      <h3 class="text-subtitle-2 font-weight-bold text-uppercase" :style="`color: ${teamMetaInfo.color};`">Micro-Architecture Flow</h3>
-                    </div>
-                    
-                    <v-card class="pa-5 glass-card-dark text-center h-100 d-flex flex-column justify-center" rounded="lg" style="border: 1px dashed rgba(255,255,255,0.1);">
-                      <!-- Inputs -->
-                      <div class="d-flex justify-center flex-wrap gap-2 mb-3">
-                        <v-chip v-for="need in teamMetaInfo.needs" :key="need.from" size="small" color="error" variant="outlined" class="font-weight-bold">
-                          <v-icon start size="x-small">mdi-login</v-icon> {{ need.what }}
-                        </v-chip>
-                        <v-chip v-if="!teamMetaInfo.needs.length" size="small" color="grey" variant="outlined">External Triggers</v-chip>
-                      </div>
-                      
-                      <v-icon color="grey-darken-1" class="mb-2">mdi-arrow-down-thick</v-icon>
-                      
-                      <!-- Core Module -->
-                      <v-card class="pa-4 glass-card mx-auto mb-2" :style="`border: 2px solid ${teamMetaInfo.color}; max-width: 250px;`">
-                        <v-icon :color="teamMetaInfo.color" size="large" class="mb-2">mdi-cogs</v-icon>
-                        <div class="text-subtitle-2 font-weight-bold text-white">{{ teamName }}</div>
-                        <div class="text-caption text-grey mt-1">Kafka / Microservices</div>
-                      </v-card>
-                      
-                      <v-icon color="grey-darken-1" class="mb-3">mdi-arrow-down-thick</v-icon>
-                      
-                      <!-- Outputs -->
-                      <div class="d-flex justify-center flex-wrap gap-2">
-                        <v-chip v-for="provide in teamMetaInfo.provides" :key="provide.to" size="small" color="success" variant="outlined" class="font-weight-bold">
-                          <v-icon start size="x-small">mdi-logout</v-icon> {{ provide.what }}
-                        </v-chip>
-                        <v-chip v-if="!teamMetaInfo.provides.length" size="small" color="grey" variant="outlined">Final Output</v-chip>
-                      </div>
-                    </v-card>
-                  </v-col>
-
-                  <!-- UI Mockup -->
-                  <v-col cols="12" md="7">
-                    <div class="d-flex align-center mb-4 mt-4 mt-md-0">
-                      <v-icon color="primary" size="small" class="mr-2">mdi-monitor-dashboard</v-icon>
-                      <h3 class="text-subtitle-2 font-weight-bold text-primary text-uppercase">Module Mockup</h3>
-                    </div>
-                    <v-card class="glass-card rounded-lg overflow-hidden" elevation="12" style="border: 1px solid rgba(255,255,255,0.05);">
-                      <v-img :src="`/java-capstone-project/images/mockups/t${teamId}.png`" cover aspect-ratio="1" class="bg-grey-darken-4">
-                        <template v-slot:placeholder>
-                          <div class="d-flex align-center justify-center fill-height">
-                            <v-progress-circular color="primary" indeterminate></v-progress-circular>
-                          </div>
-                        </template>
-                      </v-img>
-                    </v-card>
-                  </v-col>
-                </v-row>
-              </v-window-item>
             </v-window>
           </v-card-text>
         </v-card>
@@ -320,6 +287,13 @@
     </v-row>
 
     <!-- Board Columns -->
+    <v-row class="flex-grow-0 mb-1" v-if="isAuthorized">
+      <v-col cols="12" class="text-right pb-1">
+        <v-btn color="primary" prepend-icon="mdi-plus" rounded="pill" elevation="2" class="font-weight-bold" size="small" @click="dialog = true">
+          Add Task
+        </v-btn>
+      </v-col>
+    </v-row>
     <v-row class="flex-grow-1 flex-nowrap overflow-x-auto pb-4 align-stretch">
       <v-col v-for="column in columns" :key="column.id" cols="12" sm="6" md="3" class="flex-shrink-0" style="min-width: 250px;">
         <v-card class="glass-column h-100 d-flex flex-column" elevation="0" rounded="lg">
@@ -921,6 +895,63 @@ const getPriorityColor = (priority) => {
 }
 .hover-primary:hover {
   color: #6366F1 !important;
+}
+
+/* Data Flow Graph Styles */
+.focal-node {
+  position: relative;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.focal-node:hover {
+  transform: scale(1.05);
+}
+.focal-node-glow {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 150%;
+  height: 150%;
+  border-radius: 50%;
+  filter: blur(50px);
+  opacity: 0.15;
+  pointer-events: none;
+}
+.node-card {
+  transition: transform 0.2s ease;
+}
+.node-card:hover {
+  transform: translateY(-2px);
+  background: rgba(255, 255, 255, 0.05) !important;
+}
+.flow-animated-line {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: rgba(255, 255, 255, 0.1);
+  overflow: hidden;
+  transform: translateY(-50%);
+}
+.flow-animated-line::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 50%;
+  height: 100%;
+  animation: flowAnim 1.5s infinite linear;
+}
+.left-line::after {
+  background: linear-gradient(90deg, transparent, rgba(244, 67, 54, 0.8), transparent);
+}
+.right-line::after {
+  background: linear-gradient(90deg, transparent, rgba(76, 175, 80, 0.8), transparent);
+}
+@keyframes flowAnim {
+  0% { left: -50%; }
+  100% { left: 100%; }
 }
 
 .border-dashed {

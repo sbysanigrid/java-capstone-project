@@ -141,6 +141,85 @@
       </v-col>
     </v-row>
 
+    <!-- End-to-End Architecture Flow -->
+    <v-row class="mb-6">
+      <v-col cols="12" class="anim-item" style="animation-delay: 0.1s;">
+        <h2 class="text-h4 font-weight-bold mb-4 d-flex align-center">
+          End-to-End Pipeline
+          <v-chip color="secondary" variant="flat" size="small" class="ml-4 font-weight-bold">Architecture Flow</v-chip>
+        </h2>
+        
+        <v-card class="pa-6 glass-card-dark overflow-hidden" rounded="lg" elevation="0">
+          <div class="pipeline-container d-flex flex-column flex-md-row align-center justify-space-between w-100">
+            <!-- Node 1 -->
+            <div class="pipeline-node text-center mb-6 mb-md-0 position-relative">
+              <v-avatar color="primary" size="64" class="mb-3 elevation-4 pipeline-icon">
+                <v-icon size="x-large" color="white">mdi-briefcase-plus</v-icon>
+              </v-avatar>
+              <h4 class="text-subtitle-1 font-weight-bold text-white lh-sm">Demand Creation</h4>
+              <v-chip size="x-small" color="primary" variant="outlined" class="mt-1 font-weight-bold">Team 1</v-chip>
+            </div>
+            
+            <div class="pipeline-connector hidden-sm-and-down">
+              <div class="flow-line text-primary" style="color: var(--v-primary-base, #E65D24);"></div>
+              <v-icon color="primary" class="flow-arrow">mdi-chevron-right</v-icon>
+            </div>
+            
+            <!-- Node 2 -->
+            <div class="pipeline-node text-center mb-6 mb-md-0 position-relative">
+              <v-avatar color="info" size="64" class="mb-3 elevation-4 pipeline-icon">
+                <v-icon size="x-large" color="white">mdi-account-search</v-icon>
+              </v-avatar>
+              <h4 class="text-subtitle-1 font-weight-bold text-white lh-sm">Semantic Match</h4>
+              <v-chip size="x-small" color="info" variant="outlined" class="mt-1 font-weight-bold">Team 5</v-chip>
+            </div>
+            
+            <div class="pipeline-connector hidden-sm-and-down">
+              <div class="flow-line text-info" style="color: var(--v-info-base, #2196F3);"></div>
+              <v-icon color="info" class="flow-arrow">mdi-chevron-right</v-icon>
+            </div>
+            
+            <!-- Node 3 -->
+            <div class="pipeline-node text-center mb-6 mb-md-0 position-relative">
+              <v-avatar color="success" size="64" class="mb-3 elevation-4 pipeline-icon">
+                <v-icon size="x-large" color="white">mdi-web</v-icon>
+              </v-avatar>
+              <h4 class="text-subtitle-1 font-weight-bold text-white lh-sm">External Sourcing</h4>
+              <v-chip size="x-small" color="success" variant="outlined" class="mt-1 font-weight-bold">Team 3</v-chip>
+            </div>
+            
+            <div class="pipeline-connector hidden-sm-and-down">
+              <div class="flow-line text-success" style="color: var(--v-success-base, #4CAF50);"></div>
+              <v-icon color="success" class="flow-arrow">mdi-chevron-right</v-icon>
+            </div>
+            
+            <!-- Node 4 -->
+            <div class="pipeline-node text-center mb-6 mb-md-0 position-relative">
+              <v-avatar color="accent" size="64" class="mb-3 elevation-4 pipeline-icon">
+                <v-icon size="x-large" color="white">mdi-brain</v-icon>
+              </v-avatar>
+              <h4 class="text-subtitle-1 font-weight-bold text-white lh-sm">AI Scoring</h4>
+              <v-chip size="x-small" color="accent" variant="outlined" class="mt-1 font-weight-bold">Team 2 & 4</v-chip>
+            </div>
+            
+            <div class="pipeline-connector hidden-sm-and-down">
+              <div class="flow-line text-accent" style="color: var(--v-accent-base, #9C27B0);"></div>
+              <v-icon color="accent" class="flow-arrow">mdi-chevron-right</v-icon>
+            </div>
+            
+            <!-- Node 5 -->
+            <div class="pipeline-node text-center mb-4 mb-md-0 position-relative">
+              <v-avatar color="warning" size="64" class="mb-3 elevation-4 pipeline-icon">
+                <v-icon size="x-large" color="white">mdi-file-sign</v-icon>
+              </v-avatar>
+              <h4 class="text-subtitle-1 font-weight-bold text-white lh-sm">Offer & Placement</h4>
+              <v-chip size="x-small" color="warning" variant="outlined" class="mt-1 font-weight-bold">Team 2</v-chip>
+            </div>
+          </div>
+        </v-card>
+      </v-col>
+    </v-row>
+
     <v-row>
       <v-col cols="12" class="anim-item" style="animation-delay: 0.2s;">
         <h2 class="text-h4 font-weight-bold mb-4 d-flex align-center">
@@ -168,71 +247,6 @@
               <span class="text-white font-weight-medium">{{ feature.highlight }}</span>
             </div>
           </v-card-text>
-        </v-card>
-      </v-col>
-    </v-row>
-
-    <!-- Platform Preview -->
-    <v-row class="mb-6">
-      <v-col cols="12" class="anim-item" style="animation-delay: 0.4s;">
-        <h2 class="text-h4 font-weight-bold mb-4 d-flex align-center">
-          <v-icon color="secondary" class="mr-2">mdi-monitor-dashboard</v-icon>
-          Platform Preview
-        </h2>
-        <v-card class="pa-2 glass-card rounded-xl overflow-hidden" elevation="24">
-          <v-img src="/java-capstone-project/images/mockups/overview.png" cover class="rounded-lg" aspect-ratio="16/9"></v-img>
-        </v-card>
-      </v-col>
-    </v-row>
-
-    <!-- Talent Supply Chain Flow -->
-    <v-row class="mb-6">
-      <v-col cols="12" class="anim-item" style="animation-delay: 0.5s;">
-        <h2 class="text-h4 font-weight-bold mb-4 d-flex align-center">
-          <v-icon color="primary" class="mr-2">mdi-transit-connection-variant</v-icon>
-          Talent Supply Chain Flow
-        </h2>
-        <v-card class="pa-6 glass-card-dark overflow-x-auto" rounded="lg">
-          <div class="d-flex align-center justify-space-between flex-nowrap" style="min-width: 800px; gap: 16px;">
-            <!-- Demand -->
-            <v-card class="pa-4 flex-grow-1 text-center glass-card" style="border: 1px solid #E65D24;">
-              <v-icon color="#E65D24" size="large" class="mb-2">mdi-bullhorn</v-icon>
-              <div class="text-subtitle-2 font-weight-bold">Demand Creation</div>
-              <div class="text-caption text-grey">Team 1</div>
-            </v-card>
-            <v-icon color="grey-darken-1" size="large">mdi-arrow-right-thick</v-icon>
-            
-            <!-- Careers -->
-            <v-card class="pa-4 flex-grow-1 text-center glass-card" style="border: 1px solid #A9B400;">
-              <v-icon color="#A9B400" size="large" class="mb-2">mdi-web</v-icon>
-              <div class="text-subtitle-2 font-weight-bold">Careers Portal</div>
-              <div class="text-caption text-grey">Team 3</div>
-            </v-card>
-            <v-icon color="grey-darken-1" size="large">mdi-arrow-right-thick</v-icon>
-            
-            <!-- Recruitment -->
-            <v-card class="pa-4 flex-grow-1 text-center glass-card" style="border: 1px solid #006DB6;">
-              <v-icon color="#006DB6" size="large" class="mb-2">mdi-account-search</v-icon>
-              <div class="text-subtitle-2 font-weight-bold">Recruitment ATS</div>
-              <div class="text-caption text-grey">Team 2</div>
-            </v-card>
-            <v-icon color="grey-darken-1" size="large">mdi-arrow-right-thick</v-icon>
-            
-            <!-- Matching -->
-            <v-card class="pa-4 flex-grow-1 text-center glass-card" style="border: 1px solid #F59E0B;">
-              <v-icon color="#F59E0B" size="large" class="mb-2">mdi-brain</v-icon>
-              <div class="text-subtitle-2 font-weight-bold">Semantic Matching</div>
-              <div class="text-caption text-grey">Team 5</div>
-            </v-card>
-            <v-icon color="grey-darken-1" size="large">mdi-arrow-right-thick</v-icon>
-            
-            <!-- RMG -->
-            <v-card class="pa-4 flex-grow-1 text-center glass-card" style="border: 1px solid #EF4444;">
-              <v-icon color="#EF4444" size="large" class="mb-2">mdi-account-hard-hat</v-icon>
-              <div class="text-subtitle-2 font-weight-bold">RMG Allocation</div>
-              <div class="text-caption text-grey">Team 6</div>
-            </v-card>
-          </div>
         </v-card>
       </v-col>
     </v-row>
@@ -393,6 +407,64 @@ const getGlowColor = (index) => {
     opacity: 1;
     transform: translateY(0);
   }
+}
+
+/* Pipeline Animation Styles */
+.pipeline-container {
+  padding: 10px;
+}
+.pipeline-node {
+  flex: 0 0 auto;
+  width: 140px;
+  z-index: 2;
+}
+.pipeline-icon {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.pipeline-node:hover .pipeline-icon {
+  transform: scale(1.1);
+  box-shadow: 0 0 20px rgba(255, 255, 255, 0.2) !important;
+}
+.pipeline-connector {
+  flex: 1 1 auto;
+  min-width: 30px;
+  position: relative;
+  height: 2px;
+  margin: 0 10px;
+  margin-top: -50px; /* Align with center of avatar */
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+.flow-line {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: rgba(255, 255, 255, 0.1);
+  overflow: hidden;
+}
+.flow-line::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, currentColor, transparent);
+  animation: flowAnim 2s infinite linear;
+}
+
+.flow-arrow {
+  position: absolute;
+  right: -10px;
+  font-size: 24px;
+}
+
+@keyframes flowAnim {
+  0% { left: -50%; }
+  100% { left: 100%; }
 }
 </style>
 
