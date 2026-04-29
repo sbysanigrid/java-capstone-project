@@ -18,6 +18,7 @@
           
           <v-card-text class="position-relative z-1 pa-6">
             <v-row>
+              <!-- Left: Mission + chips -->
               <v-col cols="12" md="8">
                 <div class="d-flex align-center mb-2">
                   <v-icon size="small" :color="teamMetaInfo.color" class="mr-2">mdi-shield-check</v-icon>
@@ -36,21 +37,22 @@
                   </v-chip>
                 </div>
               </v-col>
+              <!-- Right: Stats -->
               <v-col cols="12" md="4" class="d-flex flex-column justify-center border-s-sm pl-md-6 mt-4 mt-md-0" style="border-color: rgba(255,255,255,0.1) !important;">
                 <div class="d-flex flex-wrap gap-3">
-                  <div class="bg-surface-variant pa-2 rounded text-center flex-grow-1 min-w-50" style="min-width: 40%;">
+                  <div class="bg-surface-variant pa-2 rounded text-center flex-grow-1" style="min-width: 40%;">
                     <div class="text-h5 font-weight-black text-white">{{ requirementsList.filter(r => r.priority === 'Must').length }}</div>
                     <div class="text-caption text-grey-lighten-1" style="font-size: 0.65rem !important;">Must-Haves</div>
                   </div>
-                  <div class="bg-surface-variant pa-2 rounded text-center flex-grow-1 min-w-50" style="min-width: 40%;">
+                  <div class="bg-surface-variant pa-2 rounded text-center flex-grow-1" style="min-width: 40%;">
                     <div class="text-h5 font-weight-black text-white">{{ requirementsList.filter(r => r.ai).length }}</div>
                     <div class="text-caption text-grey-lighten-1" style="font-size: 0.65rem !important;">AI Features</div>
                   </div>
-                  <div class="bg-surface-variant pa-2 rounded text-center flex-grow-1 min-w-50" style="min-width: 40%;">
+                  <div class="bg-surface-variant pa-2 rounded text-center flex-grow-1" style="min-width: 40%;">
                     <div class="text-h5 font-weight-black text-success">{{ teamMetaInfo.provides.length }}</div>
                     <div class="text-caption text-grey-lighten-1" style="font-size: 0.65rem !important;">Outputs</div>
                   </div>
-                  <div class="bg-surface-variant pa-2 rounded text-center flex-grow-1 min-w-50" style="min-width: 40%;">
+                  <div class="bg-surface-variant pa-2 rounded text-center flex-grow-1" style="min-width: 40%;">
                     <div class="text-h5 font-weight-black text-error">{{ teamMetaInfo.needs.length }}</div>
                     <div class="text-caption text-grey-lighten-1" style="font-size: 0.65rem !important;">Inputs</div>
                   </div>
@@ -68,6 +70,7 @@
             <v-tab value="data" class="text-caption font-weight-bold text-uppercase">Data & Integrations</v-tab>
             <v-tab value="requirements" class="text-caption font-weight-bold text-uppercase">Requirements</v-tab>
             <v-tab value="roster" class="text-caption font-weight-bold text-uppercase">Team Roster</v-tab>
+            <v-tab value="mockup" class="text-caption font-weight-bold text-uppercase">Module Preview</v-tab>
           </v-tabs>
 
           <v-card-text class="pa-0">
@@ -278,6 +281,43 @@
                     </div>
                   </v-col>
                 </v-row>
+              </v-window-item>
+
+              <!-- Module Preview Tab -->
+              <v-window-item value="mockup" class="pa-4">
+                <div class="d-flex align-center mb-3">
+                  <v-icon :color="teamMetaInfo.color" size="small" class="mr-2">mdi-monitor-screenshot</v-icon>
+                  <h3 class="text-subtitle-2 font-weight-bold text-uppercase" :style="`color: ${teamMetaInfo.color};`">Module UI Mockup</h3>
+                  <v-chip size="x-small" color="grey" variant="outlined" class="ml-3">Reference Design</v-chip>
+                </div>
+                <v-img
+                  :src="`/java-capstone-project/images/mockups/t${teamId}.png`"
+                  :alt="`Team ${teamId} module mockup`"
+                  contain
+                  class="w-100 rounded-lg"
+                  style="width: 100%; aspect-ratio: 16/10; object-fit: contain;"
+                >
+                  <template v-slot:placeholder>
+                    <div class="d-flex align-center justify-center fill-height" style="min-height: 300px;">
+                      <div class="text-center">
+                        <v-progress-circular :color="teamMetaInfo.color" indeterminate size="48" class="mb-4"></v-progress-circular>
+                        <div class="text-caption text-grey">Loading mockup...</div>
+                      </div>
+                    </div>
+                  </template>
+                  <template v-slot:error>
+                    <div class="d-flex align-center justify-center fill-height" style="min-height: 300px;">
+                      <div class="text-center">
+                        <v-icon color="grey" size="48" class="mb-3">mdi-image-off-outline</v-icon>
+                        <div class="text-caption text-grey">Mockup not available</div>
+                      </div>
+                    </div>
+                  </template>
+                </v-img>
+                <div class="text-caption text-grey-lighten-2 mt-2 text-center">
+                  <v-icon size="x-small" class="mr-1">mdi-information-outline</v-icon>
+                  Reference UI mockup for Team {{ teamId }} — {{ teamName }}
+                </div>
               </v-window-item>
 
             </v-window>
