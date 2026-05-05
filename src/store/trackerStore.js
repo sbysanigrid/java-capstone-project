@@ -55,7 +55,7 @@ export const useTrackerStore = defineStore('tracker', () => {
       const id = eng.email ? eng.email.toLowerCase() : Math.random().toString(36).substr(2, 9)
       
       // 1. Create engineer document for board display
-      await setDoc(doc(db, 'engineers', id), { ...eng, teamId: null, role: 'member' })
+      await setDoc(doc(db, 'engineers', id), { ...eng, teamId: null, role: eng.role || 'member' })
       
       // 2. Pre-provision Firebase user document
       if (eng.email) {

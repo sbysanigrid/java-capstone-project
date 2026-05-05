@@ -15,8 +15,8 @@
       
       <v-divider vertical class="mx-3 my-3 opacity-50"></v-divider>
 
-      <div class="d-none d-md-flex">
-        <v-btn v-for="team in teams" :key="team.id" :to="'/team/' + team.id" variant="text" rounded="pill" class="mx-1 nav-btn" active-class="nav-btn-active" size="small">
+      <div class="d-flex overflow-x-auto no-scrollbar align-center ml-1" style="mask-image: linear-gradient(to right, transparent, black 10px, black calc(100% - 10px), transparent);">
+        <v-btn v-for="team in teams" :key="team.id" :to="'/team/' + team.id" variant="text" rounded="pill" class="mx-1 nav-btn flex-shrink-0" active-class="nav-btn-active" size="small">
           Team {{ team.id }}
         </v-btn>
       </div>
@@ -36,8 +36,15 @@
         <template v-slot:activator="{ props }">
           <v-btn icon v-bind="props" class="profile-btn">
             <v-avatar color="primary" size="36">
-              <v-img v-if="authStore.user.photoURL" :src="authStore.user.photoURL" alt="Profile"></v-img>
-              <span v-else class="text-subtitle-1 font-weight-bold">{{ authStore.user.displayName?.charAt(0) || 'U' }}</span>
+              <img
+                v-if="authStore.user?.photoURL"
+                :src="authStore.user.photoURL"
+                referrerpolicy="no-referrer"
+                alt="Profile"
+                style="width:100%;height:100%;object-fit:cover;border-radius:50%;"
+                @error="e => { e.target.style.display='none'; showInitial = true }"
+              />
+              <span v-if="!authStore.user?.photoURL || showInitial" class="text-subtitle-1 font-weight-bold">{{ authStore.user?.displayName?.charAt(0) || 'U' }}</span>
             </v-avatar>
           </v-btn>
         </template>
@@ -61,7 +68,7 @@
 </template>
 
 <script setup>
-import { onMounted, computed } from 'vue'
+import { onMounted, computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { teamsInfo as teams } from './data/teams'
 import { useAuthStore } from './store/authStore'
@@ -73,6 +80,7 @@ const authStore = useAuthStore()
 const router = useRouter()
 const theme = useTheme()
 
+const showInitial = ref(false)
 const isDark = computed(() => theme.global.name.value === 'dark')
 
 const toggleTheme = (event) => {
@@ -191,6 +199,16 @@ html {
   letter-spacing: 1px !important;
   font-size: 1.4rem !important;
 }
+
+/* Hide scrollbar for horizontally scrollable nav */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+
 
 /* Theme Toggle Button Animation */
 .theme-toggle-btn {

@@ -1,66 +1,231 @@
 <template>
   <v-container fluid class="px-6 pb-6">
     <v-row class="mb-4" align="center">
-      <v-col cols="12" md="8">
+      <v-col cols="12" md="6">
         <h1 class="text-h4 font-weight-bold">Team Composition</h1>
         <p class="text-subtitle-1 text-medium-emphasis">Map engineers to their respective teams via drag and drop.</p>
       </v-col>
-      <v-col cols="12" md="4" class="text-right">
-        <v-file-input
-          v-model="csvFile"
-          accept=".csv"
-          label="Upload Members CSV"
-          prepend-icon="mdi-file-delimited"
-          variant="outlined"
-          density="compact"
-          hide-details
-          @update:modelValue="handleFileUpload"
-        ></v-file-input>
+      <v-col cols="12" md="6" class="d-flex align-center justify-end">
+        <!-- Add Member button -->
+        <v-btn
+          color="primary"
+          prepend-icon="mdi-account-plus"
+          rounded="pill"
+          variant="flat"
+          height="40"
+          class="font-weight-bold flex-shrink-0 mr-3"
+          @click="addDialog = true"
+        >
+          Add Member
+        </v-btn>
+
+        <!-- CSV import pill -->
+        <div class="d-flex align-center" style="height: 40px; border: 1px solid rgba(255,255,255,0.12); border-radius: 20px; overflow: hidden; background: rgba(255,255,255,0.04);">
+          <!-- Role Dropdown Menu -->
+          <v-menu offset-y>
+            <template v-slot:activator="{ props }">
+              <v-btn
+                variant="text"
+                v-bind="props"
+                append-icon="mdi-chevron-down"
+                height="40"
+                class="text-none font-weight-medium px-4 rounded-0"
+                style="border-radius: 20px 0 0 20px !important; min-width: 140px;"
+              >
+                {{ csvRole === 'member' ? 'Intern / Member' : 'Mentor' }}
+              </v-btn>
+            </template>
+            <v-list density="compact" class="py-1" elevation="8" rounded="lg">
+              <v-list-item
+                v-for="item in roleOptions"
+                :key="item.value"
+                @click="csvRole = item.value"
+                :active="csvRole === item.value"
+                color="primary"
+              >
+                <v-list-item-title class="text-body-2">{{ item.title }}</v-list-item-title>
+              </v-list-item>
+            </v-list>
+          </v-menu>
+          <div style="width: 1px; height: 24px; background: rgba(255,255,255,0.15); flex-shrink: 0;"></div>
+          <input
+            ref="csvInputRef"
+            type="file"
+            accept=".csv"
+            style="display: none;"
+            @change="handleFileUpload"
+          />
+          <v-btn
+            prepend-icon="mdi-file-upload-outline"
+            variant="text"
+            color="primary"
+            height="40"
+            class="font-weight-medium px-3 rounded-0"
+            style="border-radius: 0 20px 20px 0 !important;"
+            @click="csvInputRef.click()"
+          >
+            Upload CSV
+          </v-btn>
+        </div>
       </v-col>
     </v-row>
 
+    <!-- Add Member Dialog -->
+    <v-dialog v-model="addDialog" max-width="440" persistent>
+      <v-card rounded="xl" class="pa-2">
+        <v-card-title class="text-h6 font-weight-bold d-flex align-center pt-4 px-5">
+          <v-icon color="primary" class="mr-2">mdi-account-plus</v-icon>
+          Add Member
+        </v-card-title>
+        <v-card-text class="px-5 pb-2">
+          <v-form ref="addForm" @submit.prevent="addMemberManually">
+            <v-text-field
+              v-model="newMember.name"
+              label="Full Name"
+              prepend-inner-icon="mdi-account"
+              variant="outlined"
+              density="comfortable"
+              rounded="lg"
+              class="mb-3"
+              :rules="[v => !!v || 'Name is required']"
+              required
+            ></v-text-field>
+            <v-text-field
+              v-model="newMember.email"
+              label="Email"
+              prepend-inner-icon="mdi-email"
+              variant="outlined"
+              density="comfortable"
+              rounded="lg"
+              class="mb-3"
+              type="email"
+              :rules="[v => !!v || 'Email is required', v => /.+@.+\..+/.test(v) || 'Enter a valid email']"
+              required
+            ></v-text-field>
+            <v-text-field
+              v-model="newMember.location"
+              label="Location (City)"
+              prepend-inner-icon="mdi-map-marker"
+              variant="outlined"
+              density="comfortable"
+              rounded="lg"
+              class="mb-3"
+              :rules="[v => !!v || 'Location is required']"
+              required
+            ></v-text-field>
+            <v-select
+              v-model="newMember.role"
+              :items="roleOptions"
+              label="Role"
+              prepend-inner-icon="mdi-shield-account"
+              variant="outlined"
+              density="comfortable"
+              rounded="lg"
+              class="mb-1"
+            ></v-select>
+          </v-form>
+        </v-card-text>
+        <v-card-actions class="px-5 pb-4">
+          <v-spacer></v-spacer>
+          <v-btn variant="text" rounded="pill" @click="closeAddDialog">Cancel</v-btn>
+          <v-btn color="primary" variant="flat" rounded="pill" class="font-weight-bold" :loading="addLoading" @click="addMemberManually">Add Member</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+
     <!-- Unassigned Pool -->
-    <v-row class="pb-4">
-      <v-col cols="12">
-        <v-expansion-panels v-model="unassignedPanel">
-          <v-expansion-panel class="glass-panel" elevation="0" rounded="xl">
-            <v-expansion-panel-title class="py-4 text-h6 font-weight-bold text-white">
-              <div>
-                <v-icon start>mdi-account-question</v-icon> 
-                Unassigned ({{ getEngineersByTeam(null).length }})
+    <v-row class="pb-4" align="start">
+      <!-- Mentors Section -->
+      <v-col cols="12" md="6">
+        <v-expansion-panels v-model="unassignedMentorsPanel" multiple>
+          <v-expansion-panel class="glass-panel" elevation="0" rounded="xl" value="mentors">
+            <v-expansion-panel-title class="py-3 font-weight-bold text-white">
+              <div class="d-flex align-center">
+                <v-icon start color="secondary">mdi-shield-star</v-icon>
+                Unassigned Mentors
+                <v-chip size="x-small" color="secondary" variant="tonal" class="ml-2 font-weight-bold">{{ getUnassignedByRole('mentor').length }}</v-chip>
               </div>
             </v-expansion-panel-title>
             <v-expansion-panel-text class="pt-3 list-container">
-            <draggable
-              :list="getEngineersByTeam(null)"
-              item-key="id"
-              group="engineers"
-              @change="onChange($event, null, 'member')"
-              class="d-flex flex-wrap align-center"
-              style="gap: 8px; min-height: 60px; padding-bottom: 4px;"
-            >
-              <template #item="{ element }">
-                <v-card class="cursor-move flex-shrink-0 engineer-pill" rounded="xl" elevation="0" width="200">
-                  <div class="pill-glow"></div>
-                  <v-card-item class="py-1 px-2 position-relative z-1">
-                    <div class="d-flex justify-space-between align-center">
-                      <div class="d-flex align-center">
-                        <v-avatar size="28" color="primary" class="mr-2">
-                          <span class="text-caption font-weight-bold">{{ element.name.charAt(0) }}</span>
-                        </v-avatar>
-                        <div>
-                          <div class="text-caption font-weight-bold lh-sm">{{ element.name }}</div>
-                          <div v-if="element.location" class="text-grey-lighten-1 d-flex align-center mt-1" style="font-size: 0.65rem; line-height: 1;">
-                            <v-icon size="8" class="mr-1">mdi-map-marker</v-icon> {{ element.location }}
+              <draggable
+                :list="getUnassignedByRole('mentor')"
+                item-key="id"
+                group="engineers"
+                @change="onChange($event, null, 'mentor')"
+                class="d-flex flex-wrap align-center"
+                style="gap: 8px; min-height: 60px; padding-bottom: 4px;"
+              >
+                <template #item="{ element }">
+                  <v-card class="cursor-move flex-shrink-0 engineer-pill" rounded="xl" elevation="0" width="200" style="border: 1px solid #9C27B0;">
+                    <div class="pill-glow" style="background: linear-gradient(90deg, transparent, #9C27B033)"></div>
+                    <v-card-item class="py-1 px-2 position-relative z-1">
+                      <div class="d-flex justify-space-between align-center">
+                        <div class="d-flex align-center">
+                          <v-avatar size="28" color="secondary" class="mr-2">
+                            <v-icon size="14" color="white">mdi-shield-star</v-icon>
+                          </v-avatar>
+                          <div>
+                            <div class="text-caption font-weight-bold lh-sm">{{ element.name }}</div>
+                            <div v-if="element.location" class="text-grey-lighten-1 d-flex align-center mt-1" style="font-size: 0.65rem; line-height: 1;">
+                              <v-icon size="8" class="mr-1">mdi-map-marker</v-icon> {{ element.location }}
+                            </div>
                           </div>
                         </div>
+                        <v-btn icon="mdi-close-circle" variant="text" size="x-small" color="error" class="ml-1" @click.stop="deleteMember(element.id)"></v-btn>
                       </div>
-                      <v-btn icon="mdi-close-circle" variant="text" size="x-small" color="error" class="ml-1" @click.stop="deleteMember(element.id)"></v-btn>
-                    </div>
-                  </v-card-item>
-                </v-card>
-              </template>
-            </draggable>
+                    </v-card-item>
+                  </v-card>
+                </template>
+              </draggable>
+              <div v-if="!getUnassignedByRole('mentor').length" class="text-caption text-grey text-center py-3">No unassigned mentors</div>
+            </v-expansion-panel-text>
+          </v-expansion-panel>
+        </v-expansion-panels>
+      </v-col>
+
+      <!-- Interns / Members Section -->
+      <v-col cols="12" md="6">
+        <v-expansion-panels v-model="unassignedInternsPanel" multiple>
+          <v-expansion-panel class="glass-panel" elevation="0" rounded="xl" value="members">
+            <v-expansion-panel-title class="py-3 font-weight-bold text-white">
+              <div class="d-flex align-center">
+                <v-icon start color="primary">mdi-account-group</v-icon>
+                Unassigned Interns
+                <v-chip size="x-small" color="primary" variant="tonal" class="ml-2 font-weight-bold">{{ getUnassignedByRole('member').length }}</v-chip>
+              </div>
+            </v-expansion-panel-title>
+            <v-expansion-panel-text class="pt-3 list-container">
+              <draggable
+                :list="getUnassignedByRole('member')"
+                item-key="id"
+                group="engineers"
+                @change="onChange($event, null, 'member')"
+                class="d-flex flex-wrap align-center"
+                style="gap: 8px; min-height: 60px; padding-bottom: 4px;"
+              >
+                <template #item="{ element }">
+                  <v-card class="cursor-move flex-shrink-0 engineer-pill" rounded="xl" elevation="0" width="200">
+                    <div class="pill-glow"></div>
+                    <v-card-item class="py-1 px-2 position-relative z-1">
+                      <div class="d-flex justify-space-between align-center">
+                        <div class="d-flex align-center">
+                          <v-avatar size="28" color="primary" class="mr-2">
+                            <span class="text-caption font-weight-bold">{{ element.name.charAt(0) }}</span>
+                          </v-avatar>
+                          <div>
+                            <div class="text-caption font-weight-bold lh-sm">{{ element.name }}</div>
+                            <div v-if="element.location" class="text-grey-lighten-1 d-flex align-center mt-1" style="font-size: 0.65rem; line-height: 1;">
+                              <v-icon size="8" class="mr-1">mdi-map-marker</v-icon> {{ element.location }}
+                            </div>
+                          </div>
+                        </div>
+                        <v-btn icon="mdi-close-circle" variant="text" size="x-small" color="error" class="ml-1" @click.stop="deleteMember(element.id)"></v-btn>
+                      </div>
+                    </v-card-item>
+                  </v-card>
+                </template>
+              </draggable>
+              <div v-if="!getUnassignedByRole('member').length" class="text-caption text-grey text-center py-3">No unassigned interns</div>
             </v-expansion-panel-text>
           </v-expansion-panel>
         </v-expansion-panels>
@@ -176,7 +341,22 @@ const authStore = useAuthStore()
 const router = useRouter()
 
 const csvFile = ref(null)
-const unassignedPanel = ref(0) // Default to open
+const csvInputRef = ref(null)
+const unassignedMentorsPanel = ref([]) // Collapsed by default
+const unassignedInternsPanel = ref([]) // Collapsed by default
+
+// --- Role Options ---
+const roleOptions = [
+  { title: 'Intern / Member', value: 'member' },
+  { title: 'Mentor', value: 'mentor' }
+]
+const csvRole = ref('member')
+
+// --- Add Member Dialog ---
+const addDialog = ref(false)
+const addLoading = ref(false)
+const addForm = ref(null)
+const newMember = ref({ name: '', email: '', location: '', role: 'member' })
 
 const checkAccess = () => {
   if (authStore.isAuthReady && authStore.userRole !== 'admin') {
@@ -203,6 +383,10 @@ const getEngineersByTeamAndRole = (teamId, role) => {
   return trackerStore.engineers.filter(e => e.teamId === teamId && (e.role || 'member') === role)
 }
 
+const getUnassignedByRole = (role) => {
+  return trackerStore.engineers.filter(e => e.teamId === null && (e.role || 'member') === role)
+}
+
 const onChange = (evt, newTeamId, role = 'member') => {
   if (evt.added) {
     trackerStore.updateEngineerTeam(evt.added.element.id, newTeamId, role)
@@ -222,9 +406,32 @@ const resetTeam = (teamId) => {
   teamMembers.forEach(e => trackerStore.updateEngineerTeam(e.id, null, 'member'))
 }
 
-const handleFileUpload = (file) => {
+const closeAddDialog = () => {
+  addDialog.value = false
+  newMember.value = { name: '', email: '', location: '', role: 'member' }
+  if (addForm.value) addForm.value.reset()
+}
+
+const addMemberManually = async () => {
+  const { valid } = await addForm.value.validate()
+  if (!valid) return
+  addLoading.value = true
+  try {
+    await trackerStore.addEngineersBulk([{
+      name: newMember.value.name.trim(),
+      email: newMember.value.email.trim(),
+      location: newMember.value.location.trim(),
+      role: newMember.value.role
+    }])
+    closeAddDialog()
+  } finally {
+    addLoading.value = false
+  }
+}
+
+const handleFileUpload = (event) => {
+  const file = event?.target?.files?.[0]
   if (!file) return;
-  
   Papa.parse(file, {
     header: true,
     skipEmptyLines: true,
@@ -232,12 +439,13 @@ const handleFileUpload = (file) => {
       const parsedData = results.data.map(row => ({
         name: row.Name || row.name || 'Unknown Engineer',
         location: row.Location || row.location || '',
-        email: row.Email || row.email || ''
+        email: row.Email || row.email || '',
+        role: csvRole.value
       }));
       if (parsedData.length > 0) {
         trackerStore.addEngineersBulk(parsedData)
       }
-      csvFile.value = null; // reset
+      if (csvInputRef.value) csvInputRef.value.value = '' // reset so same file can be re-selected
     }
   });
 }
